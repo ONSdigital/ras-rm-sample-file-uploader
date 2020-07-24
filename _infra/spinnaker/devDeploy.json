@@ -1,6 +1,6 @@
 {
   "schema": "v2",
-  "application": "csv-worker",
+  "application": "sample-file-uploader",
   "name": "deploy dev",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
@@ -10,7 +10,7 @@
   "variables": {
     "namespace": "dev",
     "environment": "dev",
-    "service": "csv-worker"
+    "service": "sample-file-uploader"
   },
   "exclude": [],
   "triggers": [],

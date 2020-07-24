@@ -1,6 +1,6 @@
 {
   "schema": "v2",
-  "application": "csv-worker",
+  "application": "sample-file-uploader",
   "name": "deploy baseline",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
@@ -8,7 +8,7 @@
     "type": "front50/pipelineTemplate"
   },
   "variables": {
-    "application": "csv-worker"
+    "application": "sample-file-uploader"
   },
   "exclude": [],
   "triggers": [],

@@ -1,6 +1,6 @@
 {
   "schema": "v2",
-  "application": "csv-worker",
+  "application": "sample-file-uploader",
   "name": "deployment",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
@@ -8,7 +8,7 @@
     "type": "front50/pipelineTemplate"
   },
   "variables": {
-    "service": "csv-worker",
+    "service": "sample-file-uploader",
     "defaultVersion": "1.0.0",
     "devDeploymentCluster": "dev",
     "devDeploymentNamespace": "dev"

@@ -1,6 +1,6 @@
 {
   "cloudProviders": "kubernetes",
-  "email": "warren@warrenbailey.net",
+  "email": "john.terry@ons.gov.uk",
   "instancePort": 80,
-  "name": "csv-worker"
+  "name": "sample-file-uploader"
 }

@@ -22,4 +22,5 @@ link:
 
 .PHONY: test
 test:
+	go mod download
 	go test -v -parallel=1 -race -coverprofile=coverage.txt ./...

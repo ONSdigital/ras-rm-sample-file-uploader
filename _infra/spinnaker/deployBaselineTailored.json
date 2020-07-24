@@ -1,0 +1,19 @@
+{
+  "schema": "v2",
+  "application": "sample-file-uploader",
+  "name": "deploy baseline",
+  "template": {
+    "artifactAccount": "front50ArtifactCredentials",
+    "reference": "spinnaker://deployBaselineTailored:latest",
+    "type": "front50/pipelineTemplate"
+  },
+  "variables": {
+    "application": "sample-file-uploader"
+  },
+  "exclude": [],
+  "triggers": [],
+  "parameters": [],
+  "notifications": [],
+  "description": "",
+  "stages": []
+}

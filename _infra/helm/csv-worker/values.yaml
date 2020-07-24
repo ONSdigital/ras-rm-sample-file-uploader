@@ -14,6 +14,11 @@ resources:
   requests:
     memory: "256Mi"
 
+container:
+  port: 8080
+service:
+  port: 8080
+
 pubsub:
   project: rm-ras-sandbox
   topic: topic

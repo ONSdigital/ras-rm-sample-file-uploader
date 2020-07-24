@@ -42,11 +42,9 @@ jobs:
         with:
           version: '270.0.0'
           service_account_key: ${{ secrets.GCR_KEY }}
-        # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
           gcloud auth configure-docker
 
-      # Build the Docker image
       - name: pr docker tag
         if: github.ref != 'refs/heads/master'
         id: tag

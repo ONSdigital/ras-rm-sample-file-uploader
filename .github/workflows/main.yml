@@ -58,6 +58,22 @@ jobs:
         if: github.ref != 'refs/heads/master'
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }}
+      
+      - name: template helm
+        run: |
+          helm template $CHART_DIRECTORY
+
+      - name: package helm
+        run: |
+          echo ::set-env name=HELM_VERSION::$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
+          helm dep up $CHART_DIRECTORY
+          helm package $CHART_DIRECTORY
+
+      - name: Publish dev Chart
+        if: github.ref != 'refs/heads/master'
+        run: |
+          mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
+          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - name: Set current tag
         if: github.ref != 'refs/heads/master'
@@ -124,6 +140,11 @@ jobs:
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }}
 
+      - name: Publish Charts
+        if: github.ref == 'refs/heads/master'
+        run: |
+          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
+          
       - uses: actions/create-release@v1
         if: github.ref == 'refs/heads/master'
         env:

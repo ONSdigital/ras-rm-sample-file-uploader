@@ -29,7 +29,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: PORT
-            value: {{ .Values.container.port }}
+            value: "{{ .Values.container.port }}"
           - name: PROJECT_ID
             value: {{ .Values.pubsub.project }}
           - name: TOPIC_ID

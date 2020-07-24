@@ -136,3 +136,23 @@ jobs:
             ${{ steps.release.outputs.version }}
           draft: false
           prerelease: false
+
+      - uses: actions/create-release@v1
+        if: github.ref == 'refs/heads/master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release.outputs.version }}
+          release_name: ${{ steps.release.outputs.version }}
+          body: |
+            Automated release
+            ${{ steps.release.outputs.version }}
+          draft: false
+          prerelease: false
+
+      - name: CD hook
+        if: github.ref == 'refs/heads/master'
+        run: |
+          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
+          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-${{ env.HELM_VERSION }}.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\" }" \
+          --attribute cd="actions"

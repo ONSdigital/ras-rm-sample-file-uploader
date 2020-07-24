@@ -31,7 +31,7 @@ spec:
           image: "{{ .Values.image.devRepo }}/{{ .Chart.Name }}:{{ .Values.image.tag }}"
           {{- end}}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-        volumeMounts:
+          volumeMounts:
           - name: google-cloud-key
             mountPath: /var/secrets/google
           env:

@@ -56,9 +56,12 @@ jobs:
         if: github.ref != 'refs/heads/master'
         run: |
           make
-          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} . && cd ..
+          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} .
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: 0
       - name: Publish Docker Image
         if: github.ref != 'refs/heads/master'
         run: |
@@ -137,9 +140,12 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: |
           make
-          docker build -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }} . && cd ..
+          docker build -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }} .
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: 0
       - name: Push Release image
         if: github.ref == 'refs/heads/master'
         run: |

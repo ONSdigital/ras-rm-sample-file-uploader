@@ -56,6 +56,7 @@ jobs:
         if: github.ref != 'refs/heads/master'
         run: |
           make
+          ls -la
           docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} . && cd ..
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go

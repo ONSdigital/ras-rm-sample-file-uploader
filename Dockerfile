@@ -16,4 +16,4 @@ RUN ls -la
 RUN pwd
 USER sample-user
 
-CMD "/opt/sample/main"
+CMD "./main"

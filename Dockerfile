@@ -12,8 +12,6 @@ COPY main .
 RUN chmod 550 /opt/sample/main
 RUN chown sample-user:sample-group /opt/sample/main
 
-RUN ls -la
-RUN pwd
 USER sample-user
 
 CMD "./main"

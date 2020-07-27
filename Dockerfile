@@ -1,10 +1,16 @@
 FROM golang:1.14.4-alpine3.12
 
-RUN addgroup -S sample && adduser -S sample -G sample
+RUN addgroup -S sample-group && adduser -S sample-user -G sample-group
 
-RUN mkdir "/src"
-WORKDIR "/src"
+RUN mkdir -p "/opt/sample"
+RUN chown sample-user:sample-group /opt/sample
 
-COPY main main
+WORKDIR "/opt/sample"
+
+COPY main .
+
+RUN chmod 550 /opt/sample/main
+RUN chown sample-user:sample-group /opt/sample/main
+USER sample-user
 
 CMD "./main"

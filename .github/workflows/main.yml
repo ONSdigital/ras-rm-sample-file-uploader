@@ -24,10 +24,17 @@ jobs:
         with:
           fetch-depth: '0'
           token: ${{ secrets.BOT_TOKEN }}
+        
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Run Tests
         run: |
-          make test
+          make mod test
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
 
@@ -35,11 +42,9 @@ jobs:
         with:
           version: '270.0.0'
           service_account_key: ${{ secrets.GCR_KEY }}
-        # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
           gcloud auth configure-docker
 
-      # Build the Docker image
       - name: pr docker tag
         if: github.ref != 'refs/heads/master'
         id: tag

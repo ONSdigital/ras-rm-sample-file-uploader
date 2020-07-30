@@ -14,6 +14,7 @@ type FileProcessor struct {
 	Config config.Config
 	Client *pubsub.Client
 	Ctx context.Context
+	SampleSummary string
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) {
@@ -40,6 +41,9 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
+				Attributes: map[string]string{
+					"sampleSummary":   f.SampleSummary,
+				},
 			}).Get(f.Ctx)
 			if err != nil {
 				log.WithField("line", line).

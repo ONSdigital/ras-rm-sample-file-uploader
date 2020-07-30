@@ -23,6 +23,7 @@ var fileProcessorStub = &FileProcessor{
 	},
 	Client: nil,
 	Ctx: testContext,
+	SampleSummary: "123456",
 }
 
 func TestScannerAndPublishSuccess(t *testing.T) {

@@ -15,12 +15,12 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	sampleSummary := vars["samplesummary"]
 
 	file, handler, err := r.FormFile("file")
-	defer file.Close()
 	if err != nil {
 		log.WithError(err).
 			Error("Error retrieving the file")
 		return
 	}
+	defer file.Close()
 	fileProcessor := inject.FileProcessor
 	fileProcessor.SampleSummary = sampleSummary
 	fileProcessor.ChunkCsv(file, handler)

@@ -13,7 +13,6 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	//r.ParseMultipartForm(10 << 20)
 	vars := mux.Vars(r)
 	sampleSummary := vars["samplesummary"]
-
 	file, handler, err := r.FormFile("file")
 	if err != nil {
 		log.WithError(err).

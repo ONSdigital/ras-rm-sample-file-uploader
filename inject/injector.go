@@ -24,11 +24,15 @@ func ConfigSetup() config.Config {
 	viper.SetDefault("PORT", "8080")
 	viper.SetDefault("PROJECT_ID", "rm-ras-sandbox")
 	viper.SetDefault("TOPIC_ID", "topic")
+	viper.SetDefault("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
 	config := config.Config{
 		Port: viper.GetString("PORT"),
 		Pubsub: config.Pubsub{
 			ProjectId: viper.GetString("PROJECT_ID"),
 			TopicId: viper.GetString("TOPIC_ID"),
+		},
+		Sample: config.Sample{
+			BaseUrl: viper.GetString("SAMPLE_SERVICE_BASE_URL"),
 		},
 	}
 	return config

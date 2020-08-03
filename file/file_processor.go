@@ -4,9 +4,12 @@ import (
 	"bufio"
 	"cloud.google.com/go/pubsub"
 	"context"
+	"encoding/json"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 	"mime/multipart"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
+	"net/http"
 	"sync"
 )
 
@@ -17,7 +20,12 @@ type FileProcessor struct {
 	SampleSummary string
 }
 
+type SampleSummary struct {
+	Id string
+}
+
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) {
+	f.getSampleSummary()
 	log.WithField("filename", handler.Filename).
 		WithField("filesize", handler.Size).
 		WithField("MIMEHeader", handler.Header).
@@ -63,4 +71,20 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 		log.WithError(err).Error("Error scanning file")
 	}
 	return errorCount
+}
+
+
+func (f *FileProcessor) getSampleSummary() string {
+	resp, err := http.Post(f.Config.Sample.BaseUrl + "/samples/samplesummary", "\"application/json", nil)
+	if err != nil {
+		log.WithError(err).Error("Unable to create a sample summary");
+		return ""
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	log.WithField("body", string(body)).Debug("")
+	sampleSummary := &SampleSummary{}
+	json.Unmarshal(body, sampleSummary)
+
+	return sampleSummary.Id
 }

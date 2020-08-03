@@ -43,5 +43,11 @@ spec:
             value: {{ .Values.pubsub.topic }}
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/credentials.json
+          - name: SAMPLE_SERVICE_BASE_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://sample.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
+            value: "http://$(SAMPLE_SERVICE_HOST):$(SAMPLE_SERVICE_PORT)"
+            {{- end }}
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

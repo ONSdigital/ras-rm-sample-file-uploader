@@ -10,4 +10,8 @@ type (
 		ProjectId string `yaml:"project_id"`
 		TopicId string `yaml:"topic_id"`
 	}
+
+	Sample struct {
+		BaseUrl string `yaml:"baseUrl"`
+	}
 )

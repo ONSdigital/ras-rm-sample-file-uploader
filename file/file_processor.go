@@ -75,15 +75,15 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 
 
 func (f *FileProcessor) getSampleSummary() string {
+	log.WithField("url", f.Config.Sample.BaseUrl + "/samples/samplesummary").Info("about to create sample")
 	resp, err := http.Post(f.Config.Sample.BaseUrl + "/samples/samplesummary", "\"application/json", nil)
-	//resp, err := http.Post("/samples/samplesummary", "\"application/json", nil)
 	if err != nil {
 		log.WithError(err).Error("Unable to create a sample summary")
 		return ""
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	log.WithField("body", string(body)).Info("Returned sample summary")
+	log.WithField("body", string(body)).Info("returned sample summary")
 	sampleSummary := &SampleSummary{}
 	json.Unmarshal(body, sampleSummary)
 

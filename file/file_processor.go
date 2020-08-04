@@ -76,6 +76,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 
 func (f *FileProcessor) getSampleSummary() string {
 	resp, err := http.Post(f.Config.Sample.BaseUrl + "/samples/samplesummary", "\"application/json", nil)
+	//resp, err := http.Post("/samples/samplesummary", "\"application/json", nil)
 	if err != nil {
 		log.WithError(err).Error("Unable to create a sample summary");
 		return ""

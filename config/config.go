@@ -4,6 +4,7 @@ type (
 	Config struct {
 		Port string `yaml:"port"`
 		Pubsub Pubsub `yaml:"pubsub"`
+		Sample Sample `yaml:"sample"`
 	}
 
 	Pubsub struct {

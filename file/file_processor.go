@@ -5,18 +5,18 @@ import (
 	"cloud.google.com/go/pubsub"
 	"context"
 	"encoding/json"
+	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"mime/multipart"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	"net/http"
 	"sync"
 )
 
 type FileProcessor struct {
-	Config config.Config
-	Client *pubsub.Client
-	Ctx context.Context
+	Config        config.Config
+	Client        *pubsub.Client
+	Ctx           context.Context
 	SampleSummary string
 }
 
@@ -34,6 +34,9 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
+	log.WithField("topic", f.Config.Pubsub.TopicId).
+		WithField("project", f.Config.Pubsub.ProjectId).
+		Info("about to publish message")
 	topic := f.Client.Topic(f.Config.Pubsub.TopicId)
 	var errorCount = 0
 	var wg sync.WaitGroup
@@ -50,7 +53,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
 				Attributes: map[string]string{
-					"sampleSummary":   f.SampleSummary,
+					"sampleSummary": f.SampleSummary,
 				},
 			}).Get(f.Ctx)
 			if err != nil {
@@ -73,10 +76,9 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	return errorCount
 }
 
-
 func (f *FileProcessor) getSampleSummary() string {
-	log.WithField("url", f.Config.Sample.BaseUrl + "/samples/samplesummary").Info("about to create sample")
-	resp, err := http.Post(f.Config.Sample.BaseUrl + "/samples/samplesummary", "\"application/json", nil)
+	log.WithField("url", f.Config.Sample.BaseUrl+"/samples/samplesummary").Info("about to create sample")
+	resp, err := http.Post(f.Config.Sample.BaseUrl+"/samples/samplesummary", "\"application/json", nil)
 	if err != nil {
 		log.WithError(err).Error("Unable to create a sample summary")
 		return ""

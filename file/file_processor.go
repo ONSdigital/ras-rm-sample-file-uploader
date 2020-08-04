@@ -50,7 +50,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
 				Attributes: map[string]string{
-					"sampleSummary":   f.SampleSummary.Id,
+					"sampleSummary":   f.SampleSummary,
 				},
 			}).Get(f.Ctx)
 			if err != nil {

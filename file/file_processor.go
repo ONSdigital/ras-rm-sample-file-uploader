@@ -21,7 +21,7 @@ type FileProcessor struct {
 }
 
 type SampleSummary struct {
-	Id string
+	Id string `json:"id"`
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) {

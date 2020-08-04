@@ -29,6 +29,7 @@ func Inject() file.FileProcessor {
 var FileProcessor = Inject()
 
 func ConfigSetup() config.Config {
+	viper.AutomaticEnv()
 	viper.SetDefault("PORT", "8080")
 	viper.SetDefault("PROJECT_ID", "rm-ras-sandbox")
 	viper.SetDefault("TOPIC_ID", "topic")

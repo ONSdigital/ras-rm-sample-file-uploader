@@ -50,7 +50,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
 				Attributes: map[string]string{
-					"sampleSummary":   f.SampleSummary,
+					"sampleSummary":   f.SampleSummary.Id,
 				},
 			}).Get(f.Ctx)
 			if err != nil {
@@ -78,12 +78,12 @@ func (f *FileProcessor) getSampleSummary() string {
 	resp, err := http.Post(f.Config.Sample.BaseUrl + "/samples/samplesummary", "\"application/json", nil)
 	//resp, err := http.Post("/samples/samplesummary", "\"application/json", nil)
 	if err != nil {
-		log.WithError(err).Error("Unable to create a sample summary");
+		log.WithError(err).Error("Unable to create a sample summary")
 		return ""
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	log.WithField("body", string(body)).Debug("")
+	log.WithField("body", string(body)).Info("Returned sample summary")
 	sampleSummary := &SampleSummary{}
 	json.Unmarshal(body, sampleSummary)
 

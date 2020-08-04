@@ -9,6 +9,6 @@ import (
 
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/samples/{type}/fileupload", routes.ProcessFile)
+	router.HandleFunc("/samples/fileupload", routes.ProcessFile)
 	http.ListenAndServe(":8080", router)
 }

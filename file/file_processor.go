@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -78,7 +77,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 }
 
 func (f *FileProcessor) getSampleSummary() string {
-	baseUrl := viper.GetString("SAMPLE_SERVICE_BASE_URL")
+	baseUrl := f.Config.Sample.BaseUrl
 	log.WithField("url", baseUrl + "/samples/samplesummary").Info("about to create sample")
 	resp, err := http.Post(baseUrl + "/samples/samplesummary", "\"application/json", nil)
 	if err != nil {

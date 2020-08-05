@@ -86,9 +86,12 @@ func (f *FileProcessor) getSampleSummary() string {
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	log.WithField("body", string(body)).Info("returned sample summary")
+	log.WithField("body", string(body)).Info("returned sample summary date")
 	sampleSummary := &SampleSummary{}
-	json.Unmarshal(body, sampleSummary)
+	err = json.Unmarshal(body, sampleSummary)
+	if err != nil {
+		log.WithError(err).Error("error marshalling response data")
+	}
 
 	return sampleSummary.Id
 }

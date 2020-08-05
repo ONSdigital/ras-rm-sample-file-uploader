@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 
@@ -28,9 +27,11 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusAccepted)
 	js, err := json.Marshal(sampleSummary)
+	log.WithField("json", js).Info("returning sample summary")
 	if err != nil {
-
-	} else {
-		fmt.Fprint(w, js)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }

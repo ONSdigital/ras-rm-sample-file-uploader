@@ -20,6 +20,9 @@ var fileProcessorStub = &FileProcessor{
 			TopicId: "testtopic",
 			ProjectId: "project",
 	    },
+	    Sample: config.Sample{
+			BaseUrl: "http://localhost:8080",
+		},
 	},
 	Client: nil,
 	Ctx: testContext,
@@ -64,4 +67,8 @@ func TestScannerAndPublishBadTopic(t *testing.T) {
 	if errorCount != 8 {
 		t.Errorf("Invalid amount of errors thrown. expected: %v, actual: %v", 8, errorCount)
 	}
+}
+
+func TestSampleSummary(t *testing.T) {
+
 }

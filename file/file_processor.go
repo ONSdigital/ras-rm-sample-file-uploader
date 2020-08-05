@@ -53,7 +53,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
 				Attributes: map[string]string{
-					"sampleSummary": f.SampleSummary,
+					"sample_summary_id": f.SampleSummary,
 				},
 			}).Get(f.Ctx)
 			if err != nil {
@@ -86,12 +86,12 @@ func (f *FileProcessor) getSampleSummary() string {
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	log.WithField("body", string(body)).Info("returned sample summary date")
+	log.WithField("body", string(body)).Info("returned sample summary data")
 	sampleSummary := &SampleSummary{}
 	err = json.Unmarshal(body, sampleSummary)
 	if err != nil {
 		log.WithError(err).Error("error marshalling response data")
 	}
-
+	log.WithField("samplesummary", sampleSummary).Info("created sample summary")
 	return sampleSummary.Id
 }

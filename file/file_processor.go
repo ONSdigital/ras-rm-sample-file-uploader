@@ -18,7 +18,7 @@ type FileProcessor struct {
 	Config        config.Config
 	Client        *pubsub.Client
 	Ctx           context.Context
-	SampleSummary string
+	SampleSummary *SampleSummary
 }
 
 type SampleSummary struct {
@@ -61,7 +61,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
 				Attributes: map[string]string{
-					"sample_summary_id": f.SampleSummary,
+					"sample_summary_id": f.SampleSummary.Id,
 				},
 			}).Get(f.Ctx)
 			if err != nil {
@@ -89,7 +89,7 @@ func (f *FileProcessor) getSampleSummary() (*SampleSummary, error) {
 	log.WithField("url", baseUrl + "/samples/samplesummary").Info("about to create sample")
 	resp, err := http.Post(baseUrl + "/samples/samplesummary", "\"application/json", nil)
 	if err != nil {
-		log.WithError(err).Error("Unable to create a sample summary")
+		log.WithError(err).Error("unable to create a sample summary")
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -102,6 +102,6 @@ func (f *FileProcessor) getSampleSummary() (*SampleSummary, error) {
 		return nil, err
 	}
 	log.WithField("samplesummary", sampleSummary).Info("created sample summary")
-	f.SampleSummary = sampleSummary.Id
+	f.SampleSummary = sampleSummary
 	return sampleSummary, nil
 }

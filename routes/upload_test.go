@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -27,6 +28,9 @@ func init() {
 				TopicId: "testtopic",
 				ProjectId: "project",
 			},
+			Sample: config.Sample{
+				BaseUrl: "http://localhost:8080",
+			},
 		},
 		Client: client,
 		Ctx: ctx,
@@ -34,6 +38,14 @@ func init() {
 }
 
 func TestFileUploadSuccess(t *testing.T) {
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("{\"id\":\"123\"}"))
+	}))
+	ts.Start()
+	defer ts.Close()
+	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
+
 	inject.FileProcessor = fileProcessorStub
 	path := "../file/sample_test_file.csv"
 	file, err := os.Open(path)

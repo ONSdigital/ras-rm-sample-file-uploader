@@ -3,6 +3,8 @@ package file
 import (
 	"bufio"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
@@ -26,7 +28,9 @@ var fileProcessorStub = &FileProcessor{
 	},
 	Client: nil,
 	Ctx: testContext,
-	SampleSummary: "123456",
+	SampleSummary: &SampleSummary{
+		Id: "123456",
+	},
 }
 
 func TestScannerAndPublishSuccess(t *testing.T) {
@@ -69,6 +73,34 @@ func TestScannerAndPublishBadTopic(t *testing.T) {
 	}
 }
 
-func TestSampleSummary(t *testing.T) {
+func TestGetSampleSummary(t *testing.T) {
+	assert := assert.New(t)
 
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("{\"id\":\"123\"}"))
+	}))
+	ts.Start()
+	defer ts.Close()
+	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
+
+	sampleSummary, err := fileProcessorStub.getSampleSummary()
+	assert.Nil(err, "error should be nil")
+	assert.Equal("123", sampleSummary.Id, "sample summary id should match response")
+}
+
+func TestGetSampleSummaryErrors(t *testing.T) {
+	assert := assert.New(t)
+
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("error"))
+	}))
+	ts.Start()
+	defer ts.Close()
+	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
+
+	sampleSummary, err := fileProcessorStub.getSampleSummary()
+	assert.NotNil(err, "error should not be nil")
+	assert.Nil(sampleSummary, "sample summary should be nil")
 }

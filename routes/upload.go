@@ -17,17 +17,17 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.WithError(err).
 			Error("Error retrieving the file")
-		//w.WriteHeader(http.StatusBadRequest)
-		//return
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	sampleSummary, err := inject.FileProcessor.ChunkCsv(file, handler)
 	if err != nil {
-		//w.WriteHeader(http.StatusInternalServerError)
-		//return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusAccepted)
 	js, err := json.Marshal(sampleSummary)
-	log.WithField("json", js).Info("returning sample summary")
+	log.WithField("json", string(js)).Info("returning sample summary")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

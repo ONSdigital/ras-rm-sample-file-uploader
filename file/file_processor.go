@@ -25,10 +25,10 @@ type SampleSummary struct {
 	Id string `json:"id"`
 }
 
-func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) error {
-	err := f.getSampleSummary()
+func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
+	sampleSummary, err := f.getSampleSummary()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	log.WithField("filename", handler.Filename).
 		WithField("filesize", handler.Size).
@@ -36,9 +36,9 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 		Info("File uploaded")
 	errorCount := f.Publish(bufio.NewScanner(file))
 	if errorCount > 0 {
-		return errors.New("unable to process all of sample file")
+		return nil, errors.New("unable to process all of sample file")
 	}
-	return nil
+	return sampleSummary, nil
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
@@ -84,13 +84,13 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	return errorCount
 }
 
-func (f *FileProcessor) getSampleSummary() error {
+func (f *FileProcessor) getSampleSummary() (*SampleSummary, error) {
 	baseUrl := f.Config.Sample.BaseUrl
 	log.WithField("url", baseUrl + "/samples/samplesummary").Info("about to create sample")
 	resp, err := http.Post(baseUrl + "/samples/samplesummary", "\"application/json", nil)
 	if err != nil {
 		log.WithError(err).Error("Unable to create a sample summary")
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -99,9 +99,9 @@ func (f *FileProcessor) getSampleSummary() error {
 	err = json.Unmarshal(body, sampleSummary)
 	if err != nil {
 		log.WithError(err).Error("error marshalling response data")
-		return err
+		return nil, err
 	}
 	log.WithField("samplesummary", sampleSummary).Info("created sample summary")
 	f.SampleSummary = sampleSummary.Id
-	return nil
+	return sampleSummary, nil
 }

@@ -17,8 +17,8 @@ clean:
 
 .PHONY: link
 link:
-	mkdir -p $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample
-	ln -sf $(shell pwd) $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample/
+	mkdir -p $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample-file-uploader
+	ln -sf $(shell pwd) $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample-file-uploader/
 
 .PHONY: mod
 mod:

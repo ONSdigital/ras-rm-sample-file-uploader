@@ -3,6 +3,8 @@ package file
 import (
 	"bufio"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
@@ -20,9 +22,15 @@ var fileProcessorStub = &FileProcessor{
 			TopicId: "testtopic",
 			ProjectId: "project",
 	    },
+	    Sample: config.Sample{
+			BaseUrl: "http://localhost:8080",
+		},
 	},
 	Client: nil,
 	Ctx: testContext,
+	SampleSummary: &SampleSummary{
+		Id: "123456",
+	},
 }
 
 func TestScannerAndPublishSuccess(t *testing.T) {
@@ -63,4 +71,36 @@ func TestScannerAndPublishBadTopic(t *testing.T) {
 	if errorCount != 8 {
 		t.Errorf("Invalid amount of errors thrown. expected: %v, actual: %v", 8, errorCount)
 	}
+}
+
+func TestGetSampleSummary(t *testing.T) {
+	assert := assert.New(t)
+
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("{\"id\":\"123\"}"))
+	}))
+	ts.Start()
+	defer ts.Close()
+	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
+
+	sampleSummary, err := fileProcessorStub.getSampleSummary()
+	assert.Nil(err, "error should be nil")
+	assert.Equal("123", sampleSummary.Id, "sample summary id should match response")
+}
+
+func TestGetSampleSummaryErrors(t *testing.T) {
+	assert := assert.New(t)
+
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("error"))
+	}))
+	ts.Start()
+	defer ts.Close()
+	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
+
+	sampleSummary, err := fileProcessorStub.getSampleSummary()
+	assert.NotNil(err, "error should not be nil")
+	assert.Nil(sampleSummary, "sample summary should be nil")
 }

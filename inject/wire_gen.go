@@ -29,14 +29,19 @@ func Inject() file.FileProcessor {
 var FileProcessor = Inject()
 
 func ConfigSetup() config.Config {
+	viper.AutomaticEnv()
 	viper.SetDefault("PORT", "8080")
 	viper.SetDefault("PROJECT_ID", "rm-ras-sandbox")
 	viper.SetDefault("TOPIC_ID", "topic")
+	viper.SetDefault("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
 	config2 := config.Config{
 		Port: viper.GetString("PORT"),
 		Pubsub: config.Pubsub{
 			ProjectId: viper.GetString("PROJECT_ID"),
 			TopicId:   viper.GetString("TOPIC_ID"),
+		},
+		Sample: config.Sample{
+			BaseUrl: viper.GetString("SAMPLE_SERVICE_BASE_URL"),
 		},
 	}
 	return config2

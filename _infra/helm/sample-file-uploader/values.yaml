@@ -12,7 +12,7 @@ image:
 
 resources:
   requests:
-    memory: "256Mi"
+    memory: "32Mi"
 
 container:
   port: 8080
@@ -22,3 +22,7 @@ service:
 pubsub:
   project: rm-ras-sandbox
   topic: topic
+
+dns:
+  enabled: false
+  wellKnownPort: 8080

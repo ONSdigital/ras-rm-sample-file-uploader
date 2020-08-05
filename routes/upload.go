@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"fmt"
+	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 
@@ -17,9 +17,21 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.WithError(err).
 			Error("Error retrieving the file")
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	inject.FileProcessor.ChunkCsv(file, handler)
+	sampleSummary, err := inject.FileProcessor.ChunkCsv(file, handler)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusAccepted)
-	fmt.Fprintf(w, "Successfully Uploaded File\n")
+	js, err := json.Marshal(sampleSummary)
+	log.WithField("json", string(js)).Info("returning sample summary")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }

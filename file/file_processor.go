@@ -4,27 +4,47 @@ import (
 	"bufio"
 	"cloud.google.com/go/pubsub"
 	"context"
-	log "github.com/sirupsen/logrus"
-	"mime/multipart"
+	"encoding/json"
+	"errors"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
+	log "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"mime/multipart"
+	"net/http"
 	"sync"
 )
 
 type FileProcessor struct {
-	Config config.Config
-	Client *pubsub.Client
-	Ctx context.Context
+	Config        config.Config
+	Client        *pubsub.Client
+	Ctx           context.Context
+	SampleSummary *SampleSummary
 }
 
-func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) {
+type SampleSummary struct {
+	Id string `json:"id"`
+}
+
+func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
+	sampleSummary, err := f.getSampleSummary()
+	if err != nil {
+		return nil, err
+	}
 	log.WithField("filename", handler.Filename).
 		WithField("filesize", handler.Size).
 		WithField("MIMEHeader", handler.Header).
 		Info("File uploaded")
-	f.Publish(bufio.NewScanner(file))
+	errorCount := f.Publish(bufio.NewScanner(file))
+	if errorCount > 0 {
+		return nil, errors.New("unable to process all of sample file")
+	}
+	return sampleSummary, nil
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
+	log.WithField("topic", f.Config.Pubsub.TopicId).
+		WithField("project", f.Config.Pubsub.ProjectId).
+		Info("about to publish message")
 	topic := f.Client.Topic(f.Config.Pubsub.TopicId)
 	var errorCount = 0
 	var wg sync.WaitGroup
@@ -40,6 +60,9 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
 				Data: []byte(line),
+				Attributes: map[string]string{
+					"sample_summary_id": f.SampleSummary.Id,
+				},
 			}).Get(f.Ctx)
 			if err != nil {
 				log.WithField("line", line).
@@ -59,4 +82,26 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 		log.WithError(err).Error("Error scanning file")
 	}
 	return errorCount
+}
+
+func (f *FileProcessor) getSampleSummary() (*SampleSummary, error) {
+	baseUrl := f.Config.Sample.BaseUrl
+	log.WithField("url", baseUrl + "/samples/samplesummary").Info("about to create sample")
+	resp, err := http.Post(baseUrl + "/samples/samplesummary", "\"application/json", nil)
+	if err != nil {
+		log.WithError(err).Error("unable to create a sample summary")
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	log.WithField("body", string(body)).Info("returned sample summary data")
+	sampleSummary := &SampleSummary{}
+	err = json.Unmarshal(body, sampleSummary)
+	if err != nil {
+		log.WithError(err).Error("error marshalling response data")
+		return nil, err
+	}
+	log.WithField("samplesummary", sampleSummary).Info("created sample summary")
+	f.SampleSummary = sampleSummary
+	return sampleSummary, nil
 }

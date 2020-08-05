@@ -5,6 +5,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -24,13 +25,20 @@ type SampleSummary struct {
 	Id string `json:"id"`
 }
 
-func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) {
-	f.getSampleSummary()
+func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) error {
+	err := f.getSampleSummary()
+	if err != nil {
+		return err
+	}
 	log.WithField("filename", handler.Filename).
 		WithField("filesize", handler.Size).
 		WithField("MIMEHeader", handler.Header).
 		Info("File uploaded")
-	f.Publish(bufio.NewScanner(file))
+	errorCount := f.Publish(bufio.NewScanner(file))
+	if errorCount > 0 {
+		return errors.New("unable to process all of sample file")
+	}
+	return nil
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
@@ -76,13 +84,13 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	return errorCount
 }
 
-func (f *FileProcessor) getSampleSummary() string {
+func (f *FileProcessor) getSampleSummary() error {
 	baseUrl := f.Config.Sample.BaseUrl
 	log.WithField("url", baseUrl + "/samples/samplesummary").Info("about to create sample")
 	resp, err := http.Post(baseUrl + "/samples/samplesummary", "\"application/json", nil)
 	if err != nil {
 		log.WithError(err).Error("Unable to create a sample summary")
-		return ""
+		return err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -91,7 +99,9 @@ func (f *FileProcessor) getSampleSummary() string {
 	err = json.Unmarshal(body, sampleSummary)
 	if err != nil {
 		log.WithError(err).Error("error marshalling response data")
+		return err
 	}
 	log.WithField("samplesummary", sampleSummary).Info("created sample summary")
-	return sampleSummary.Id
+	f.SampleSummary = sampleSummary.Id
+	return nil
 }

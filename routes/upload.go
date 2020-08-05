@@ -17,9 +17,14 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.WithError(err).
 			Error("Error retrieving the file")
-		return
+		//w.WriteHeader(http.StatusBadRequest)
+		//return
 	}
-	inject.FileProcessor.ChunkCsv(file, handler)
+	err = inject.FileProcessor.ChunkCsv(file, handler)
+	if err != nil {
+		//w.WriteHeader(http.StatusInternalServerError)
+		//return
+	}
 	w.WriteHeader(http.StatusAccepted)
 	fmt.Fprintf(w, "Successfully Uploaded File\n")
 }

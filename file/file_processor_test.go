@@ -7,9 +7,10 @@ import (
 	"net/http/httptest"
 	"os"
 
+	"testing"
+
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/stub"
-	"testing"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,17 +20,19 @@ var fileProcessorStub = &FileProcessor{
 	Config: config.Config{
 		Port: "8080",
 		Pubsub: config.Pubsub{
-			TopicId: "testtopic",
+			TopicId:   "testtopic",
 			ProjectId: "project",
-	    },
-	    Sample: config.Sample{
+		},
+		Sample: config.Sample{
 			BaseUrl: "http://localhost:8080",
 		},
 	},
 	Client: nil,
-	Ctx: testContext,
+	Ctx:    testContext,
 	SampleSummary: &SampleSummary{
-		Id: "123456",
+		Id:                            "123456",
+		TotalSampleUnits:              5,
+		ExpectedCollectionInstruments: 1,
 	},
 }
 
@@ -78,15 +81,17 @@ func TestGetSampleSummary(t *testing.T) {
 
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusAccepted)
-		w.Write([]byte("{\"id\":\"123\"}"))
+		w.Write([]byte("{\"id\":\"123\",\"totalSampleUnits\":5,\"expectedCollectionInstruments\":1}"))
 	}))
 	ts.Start()
 	defer ts.Close()
 	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
 
-	sampleSummary, err := fileProcessorStub.getSampleSummary()
+	sampleSummary, err := fileProcessorStub.getSampleSummary(1, 2)
 	assert.Nil(err, "error should be nil")
 	assert.Equal("123", sampleSummary.Id, "sample summary id should match response")
+	assert.Equal(5, sampleSummary.TotalSampleUnits)
+	assert.Equal(1, sampleSummary.ExpectedCollectionInstruments)
 }
 
 func TestGetSampleSummaryErrors(t *testing.T) {
@@ -100,7 +105,19 @@ func TestGetSampleSummaryErrors(t *testing.T) {
 	defer ts.Close()
 	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
 
-	sampleSummary, err := fileProcessorStub.getSampleSummary()
+	sampleSummary, err := fileProcessorStub.getSampleSummary(1, 2)
 	assert.NotNil(err, "error should not be nil")
 	assert.Nil(sampleSummary, "sample summary should be nil")
+}
+
+func TestGetCount(t *testing.T) {
+	file, err := os.Open("sample_test_file.csv")
+	assert.Nil(t, err)
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	ciCount, totalCount := fileProcessorStub.getCount(scanner)
+
+	assert.Equal(t, 8, totalCount)
+	assert.Equal(t, 1, ciCount)
 }

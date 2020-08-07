@@ -31,7 +31,7 @@ type SampleSummary struct {
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
-	ciCount, totalUnits := f.GetCount(bufio.NewScanner(file))
+	ciCount, totalUnits := f.getCount(bufio.NewScanner(file))
 	sampleSummary, err := f.getSampleSummary(ciCount, totalUnits)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 	return sampleSummary, nil
 }
 
-func (f *FileProcessor) GetCount(scanner *bufio.Scanner) (int, int) {
+func (f *FileProcessor) getCount(scanner *bufio.Scanner) (int, int) {
 	sampleCount := 0
 	formTypes := make(map[string]string)
 	for scanner.Scan() {

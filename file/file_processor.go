@@ -2,16 +2,19 @@ package file
 
 import (
 	"bufio"
-	"cloud.google.com/go/pubsub"
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"strings"
 	"sync"
+
+	"cloud.google.com/go/pubsub"
+	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
+	log "github.com/sirupsen/logrus"
 )
 
 type FileProcessor struct {
@@ -22,11 +25,14 @@ type FileProcessor struct {
 }
 
 type SampleSummary struct {
-	Id string `json:"id"`
+	Id                            string `json:"id"`
+	TotalSampleUnits              int    `json:"totalSampleUnits"`
+	ExpectedCollectionInstruments int    `json:"expectedCollectionInstruments"`
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
-	sampleSummary, err := f.getSampleSummary()
+	ciCount, totalUnits := f.GetCount(bufio.NewScanner(file))
+	sampleSummary, err := f.getSampleSummary(ciCount, totalUnits)
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +45,18 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 		return nil, errors.New("unable to process all of sample file")
 	}
 	return sampleSummary, nil
+}
+
+func (f *FileProcessor) GetCount(scanner *bufio.Scanner) (int, int) {
+	sampleCount := 0
+	formTypes := make(map[string]string)
+	for scanner.Scan() {
+		sampleCount++
+		line := scanner.Text()
+		s := strings.Split(line, ":")
+		formTypes[s[26]] = s[26]
+	}
+	return len(formTypes), sampleCount
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
@@ -84,10 +102,21 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	return errorCount
 }
 
-func (f *FileProcessor) getSampleSummary() (*SampleSummary, error) {
+func (f *FileProcessor) getSampleSummary(ciCount int, totalUnits int) (*SampleSummary, error) {
 	baseUrl := f.Config.Sample.BaseUrl
-	log.WithField("url", baseUrl + "/samples/samplesummary").Info("about to create sample")
-	resp, err := http.Post(baseUrl + "/samples/samplesummary", "\"application/json", nil)
+	log.WithField("url", baseUrl+"/samples/samplesummary").Info("about to create sample")
+	summaryRequest := &SampleSummary{
+		TotalSampleUnits:              totalUnits,
+		ExpectedCollectionInstruments: ciCount,
+	}
+
+	b, err := json.Marshal(summaryRequest)
+	if err != nil {
+		log.WithField("summaryRequest", summaryRequest).WithError(err).Error("Error marshalling Sample Summary Request")
+		return nil, err
+	}
+
+	resp, err := http.Post(baseUrl+"/samples/samplesummary", "\"application/json", bytes.NewReader(b))
 	if err != nil {
 		log.WithError(err).Error("unable to create a sample summary")
 		return nil, err

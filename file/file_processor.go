@@ -116,7 +116,7 @@ func (f *FileProcessor) getSampleSummary(ciCount int, totalUnits int) (*SampleSu
 		return nil, err
 	}
 
-	resp, err := http.Post(baseUrl+"/samples/samplesummary", "\"application/json", bytes.NewReader(b))
+	resp, err := http.Post(baseUrl+"/samples/samplesummary", "application/json", bytes.NewReader(b))
 	if err != nil {
 		log.WithError(err).Error("unable to create a sample summary")
 		return nil, err

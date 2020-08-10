@@ -70,7 +70,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	for scanner.Scan() {
 		line := scanner.Text()
 		log.WithField("line", line).
-			Debug("Publishing csv line")
+			Info("Publishing csv line")
 
 		wg.Add(1)
 		go func(line string, topic *pubsub.Topic, wg *sync.WaitGroup, mux *sync.Mutex, errorCount *int) {
@@ -92,7 +92,7 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 			}
 			log.WithField("line", line).
 				WithField("messageId", id).
-				Debug("csv line acknowledged")
+				Info("csv line acknowledged")
 		}(line, topic, &wg, &mux, &errorCount)
 	}
 	wg.Wait()

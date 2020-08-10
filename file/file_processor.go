@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -31,7 +32,10 @@ type SampleSummary struct {
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
-	ciCount, totalUnits := f.getCount(bufio.NewScanner(file))
+	var buf bytes.Buffer
+	tee := io.TeeReader(file, &buf)
+
+	ciCount, totalUnits := f.getCount(bufio.NewScanner(tee))
 	sampleSummary, err := f.getSampleSummary(ciCount, totalUnits)
 	if err != nil {
 		return nil, err

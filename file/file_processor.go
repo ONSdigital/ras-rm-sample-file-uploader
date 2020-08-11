@@ -35,7 +35,7 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 	// tee := io.TeeReader(file, &buf)
 
 	// ciCount, totalUnits := f.getCount(bufio.NewScanner(tee))
-	sampleSummary, err := f.getSampleSummary(8, 1)
+	sampleSummary, err := f.getSampleSummary(1, 8)
 	if err != nil {
 		return nil, err
 	}

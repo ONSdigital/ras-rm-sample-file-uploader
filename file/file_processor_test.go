@@ -49,11 +49,13 @@ func TestScannerAndPublishSuccess(t *testing.T) {
 
 	scanner := bufio.NewScanner(file)
 
-	errorCount := fileProcessorStub.Publish(scanner)
+	linecount, errorCount := fileProcessorStub.Publish(scanner)
 
 	if errorCount != 0 {
 		t.Errorf("Errors have been thrown. expected: %v, actual: %v", 0, errorCount)
 	}
+
+	assert.Equal(t, 8, linecount)
 }
 
 func TestScannerAndPublishBadTopic(t *testing.T) {
@@ -69,11 +71,13 @@ func TestScannerAndPublishBadTopic(t *testing.T) {
 
 	scanner := bufio.NewScanner(file)
 
-	errorCount := fileProcessorStub.Publish(scanner)
+	linecount, errorCount := fileProcessorStub.Publish(scanner)
 
 	if errorCount != 8 {
 		t.Errorf("Invalid amount of errors thrown. expected: %v, actual: %v", 8, errorCount)
 	}
+
+	assert.Equal(t, 8, linecount)
 }
 
 func TestGetSampleSummary(t *testing.T) {
@@ -87,7 +91,7 @@ func TestGetSampleSummary(t *testing.T) {
 	defer ts.Close()
 	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
 
-	sampleSummary, err := fileProcessorStub.getSampleSummary(1, 2)
+	sampleSummary, err := fileProcessorStub.getSampleSummary()
 	assert.Nil(err, "error should be nil")
 	assert.Equal("123", sampleSummary.Id, "sample summary id should match response")
 	assert.Equal(5, sampleSummary.TotalSampleUnits)
@@ -105,7 +109,7 @@ func TestGetSampleSummaryErrors(t *testing.T) {
 	defer ts.Close()
 	fileProcessorStub.Config.Sample.BaseUrl = ts.URL
 
-	sampleSummary, err := fileProcessorStub.getSampleSummary(1, 2)
+	sampleSummary, err := fileProcessorStub.getSampleSummary()
 	assert.NotNil(err, "error should not be nil")
 	assert.Nil(sampleSummary, "sample summary should be nil")
 }

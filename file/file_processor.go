@@ -43,7 +43,7 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 	if errorCount > 0 {
 		return nil, errors.New("unable to process all of sample file")
 	}
-	f.updateSampleSummary(lineCount, 1, sampleSummary.Id)
+	f.updateSampleSummary(1, lineCount, sampleSummary.Id)
 	return sampleSummary, nil
 }
 

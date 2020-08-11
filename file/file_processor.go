@@ -31,7 +31,11 @@ type SampleSummary struct {
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
-	sampleSummary, err := f.getSampleSummary()
+	// var buf bytes.Buffer
+	// tee := io.TeeReader(file, &buf)
+
+	// ciCount, totalUnits := f.getCount(bufio.NewScanner(tee))
+	sampleSummary, err := f.getSampleSummary(8, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -39,11 +43,10 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 		WithField("filesize", handler.Size).
 		WithField("MIMEHeader", handler.Header).
 		Info("File uploaded")
-	lineCount, errorCount := f.Publish(bufio.NewScanner(file))
+	errorCount := f.Publish(bufio.NewScanner(file))
 	if errorCount > 0 {
 		return nil, errors.New("unable to process all of sample file")
 	}
-	f.updateSampleSummary(lineCount, 1, sampleSummary.Id)
 	return sampleSummary, nil
 }
 
@@ -59,23 +62,21 @@ func (f *FileProcessor) getCount(scanner *bufio.Scanner) (int, int) {
 	return len(formTypes), sampleCount
 }
 
-func (f *FileProcessor) Publish(scanner *bufio.Scanner) (int, int) {
+func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 	log.WithField("topic", f.Config.Pubsub.TopicId).
 		WithField("project", f.Config.Pubsub.ProjectId).
 		Info("about to publish message")
 	topic := f.Client.Topic(f.Config.Pubsub.TopicId)
 	var errorCount = 0
-	var lineCount = 0
 	var wg sync.WaitGroup
 	var mux sync.Mutex
 	for scanner.Scan() {
 		line := scanner.Text()
-		lineCount++
 		log.WithField("line", line).
-			Debug("Publishing csv line")
+			Info("Publishing csv line")
 
 		wg.Add(1)
-		go func(line string, topic *pubsub.Topic, wg *sync.WaitGroup, mux *sync.Mutex) {
+		go func(line string, topic *pubsub.Topic, wg *sync.WaitGroup, mux *sync.Mutex, errorCount *int) {
 			defer wg.Done()
 
 			id, err := topic.Publish(f.Ctx, &pubsub.Message{
@@ -89,47 +90,24 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) (int, int) {
 					WithError(err).
 					Error("Error publishing csv line")
 				mux.Lock()
-				errorCount++
+				*errorCount++
 				mux.Unlock()
 			}
 			log.WithField("line", line).
 				WithField("messageId", id).
-				Debug("csv line acknowledged")
-		}(line, topic, &wg, &mux)
+				Info("csv line acknowledged")
+		}(line, topic, &wg, &mux, &errorCount)
 	}
 	wg.Wait()
 	if err := scanner.Err(); err != nil {
 		log.WithError(err).Error("Error scanning file")
 	}
-	return lineCount, errorCount
+	return errorCount
 }
 
-func (f *FileProcessor) getSampleSummary() (*SampleSummary, error) {
+func (f *FileProcessor) getSampleSummary(ciCount int, totalUnits int) (*SampleSummary, error) {
 	baseUrl := f.Config.Sample.BaseUrl
 	log.WithField("url", baseUrl+"/samples/samplesummary").Info("about to create sample")
-
-	resp, err := http.Post(baseUrl+"/samples/samplesummary", "application/json", nil)
-	if err != nil {
-		log.WithError(err).Error("unable to create a sample summary")
-		return nil, err
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	log.WithField("body", string(body)).Info("returned sample summary data")
-	sampleSummary := &SampleSummary{}
-	err = json.Unmarshal(body, sampleSummary)
-	if err != nil {
-		log.WithError(err).Error("error marshalling response data")
-		return nil, err
-	}
-	log.WithField("samplesummary", sampleSummary).Info("created sample summary")
-	f.SampleSummary = sampleSummary
-	return sampleSummary, nil
-}
-
-func (f *FileProcessor) updateSampleSummary(ciCount int, totalUnits int, summaryId string) (*SampleSummary, error) {
-	baseUrl := f.Config.Sample.BaseUrl
-	log.WithField("SampleSummary", summaryId).Info("Updating Sample")
 	summaryRequest := &SampleSummary{
 		TotalSampleUnits:              totalUnits,
 		ExpectedCollectionInstruments: ciCount,
@@ -141,9 +119,9 @@ func (f *FileProcessor) updateSampleSummary(ciCount int, totalUnits int, summary
 		return nil, err
 	}
 
-	resp, err := http.NewRequest("PUT", baseUrl+"/samplesummary/"+summaryId, bytes.NewReader(b))
+	resp, err := http.Post(baseUrl+"/samples/samplesummary", "application/json", bytes.NewReader(b))
 	if err != nil {
-		log.WithError(err).Error("unable to update a sample summary")
+		log.WithError(err).Error("unable to create a sample summary")
 		return nil, err
 	}
 	defer resp.Body.Close()

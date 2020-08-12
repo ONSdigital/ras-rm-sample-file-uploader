@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+const FORMTYPE_CSV_POSITION = 25
 // readFileForCountTotals reads the file for counting
 // the total expected CIs and total sample count.
 // Will return a buffer thats written to by the tee reader
@@ -21,7 +22,7 @@ func readFileForCountTotals(r io.Reader) (int, int, *bytes.Buffer) {
 		sampleCount++
 		line := scanner.Text()
 		s := strings.Split(line, ":")
-		formTypes[s[25]] = s[25]
+		formTypes[s[FORMTYPE_CSV_POSITION]] = s[FORMTYPE_CSV_POSITION]
 	}
 	return len(formTypes), sampleCount, &buf
 }

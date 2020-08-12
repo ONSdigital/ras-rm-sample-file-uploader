@@ -51,9 +51,7 @@ func TestScannerAndPublishSuccess(t *testing.T) {
 
 	errorCount := fileProcessorStub.Publish(scanner)
 
-	if errorCount != 0 {
-		t.Errorf("Errors have been thrown. expected: %v, actual: %v", 0, errorCount)
-	}
+	assert.Equal(t, 0, errorCount)
 }
 
 func TestScannerAndPublishBadTopic(t *testing.T) {
@@ -71,9 +69,7 @@ func TestScannerAndPublishBadTopic(t *testing.T) {
 
 	errorCount := fileProcessorStub.Publish(scanner)
 
-	if errorCount != 8 {
-		t.Errorf("Invalid amount of errors thrown. expected: %v, actual: %v", 8, errorCount)
-	}
+	assert.Equal(t, 9, errorCount)
 }
 
 func TestGetSampleSummary(t *testing.T) {
@@ -108,16 +104,4 @@ func TestGetSampleSummaryErrors(t *testing.T) {
 	sampleSummary, err := fileProcessorStub.getSampleSummary(1, 2)
 	assert.NotNil(err, "error should not be nil")
 	assert.Nil(sampleSummary, "sample summary should be nil")
-}
-
-func TestGetCount(t *testing.T) {
-	file, err := os.Open("sample_test_file.csv")
-	assert.Nil(t, err)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	ciCount, totalCount := fileProcessorStub.getCount(scanner)
-
-	assert.Equal(t, 8, totalCount)
-	assert.Equal(t, 1, ciCount)
 }

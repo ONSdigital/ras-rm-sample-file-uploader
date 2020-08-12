@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"strings"
 	"sync"
 
 	"cloud.google.com/go/pubsub"
@@ -31,11 +30,8 @@ type SampleSummary struct {
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
-	// var buf bytes.Buffer
-	// tee := io.TeeReader(file, &buf)
-
-	// ciCount, totalUnits := f.getCount(bufio.NewScanner(tee))
-	sampleSummary, err := f.getSampleSummary(1, 32)
+	ciCount, totalUnits, buf := readFileForCountTotals(file)
+	sampleSummary, err := f.getSampleSummary(ciCount, totalUnits)
 	if err != nil {
 		return nil, err
 	}
@@ -43,23 +39,11 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 		WithField("filesize", handler.Size).
 		WithField("MIMEHeader", handler.Header).
 		Info("File uploaded")
-	errorCount := f.Publish(bufio.NewScanner(file))
+	errorCount := f.Publish(bufio.NewScanner(buf))
 	if errorCount > 0 {
 		return nil, errors.New("unable to process all of sample file")
 	}
 	return sampleSummary, nil
-}
-
-func (f *FileProcessor) getCount(scanner *bufio.Scanner) (int, int) {
-	sampleCount := 0
-	formTypes := make(map[string]string)
-	for scanner.Scan() {
-		sampleCount++
-		line := scanner.Text()
-		s := strings.Split(line, ":")
-		formTypes[s[26]] = s[26]
-	}
-	return len(formTypes), sampleCount
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {

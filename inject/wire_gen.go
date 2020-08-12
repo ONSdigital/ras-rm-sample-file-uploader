@@ -30,6 +30,7 @@ var FileProcessor = Inject()
 
 func ConfigSetup() config.Config {
 	viper.AutomaticEnv()
+	configureLogging()
 	viper.SetDefault("PORT", "8080")
 	viper.SetDefault("PROJECT_ID", "rm-ras-sandbox")
 	viper.SetDefault("TOPIC_ID", "topic")
@@ -45,6 +46,16 @@ func ConfigSetup() config.Config {
 		},
 	}
 	return config2
+}
+
+func configureLogging() {
+	verbose := viper.GetBool("VERBOSE")
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	if verbose {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.InfoLevel)
+	}
 }
 
 func NewFileProcessor(config2 config.Config, client *pubsub.Client, ctx context.Context) file.FileProcessor {

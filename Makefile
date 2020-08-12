@@ -1,7 +1,7 @@
 projectName := file-uploader
 
 .PHONY: install
-install: checkgo clean link
+install: checkgo clean mod
 	go build -i -v -o main
 	chmod 755 main
 
@@ -14,11 +14,6 @@ endif
 .PHONY: clean
 clean:
 	rm -f main
-
-.PHONY: link
-link:
-	mkdir -p $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample
-	ln -sf $(shell pwd) $(GOPATH)/src/github.com/ONSdigital/ras-rm-sample/
 
 .PHONY: mod
 mod:

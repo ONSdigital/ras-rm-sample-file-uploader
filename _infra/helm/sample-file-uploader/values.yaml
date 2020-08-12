@@ -23,6 +23,9 @@ pubsub:
   project: rm-ras-sandbox
   topic: topic
 
+logging:
+  verbose: true
+
 dns:
   enabled: false
   wellKnownPort: 8080

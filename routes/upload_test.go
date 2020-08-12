@@ -4,28 +4,31 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/file"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/inject"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/stub"
+	"github.com/stretchr/testify/assert"
 )
 
 var fileProcessorStub file.FileProcessor
 var ctx = context.Background()
+
 func init() {
 	_, client := stub.CreateTestPubSubServer("testtopic", ctx)
 	fileProcessorStub = file.FileProcessor{
 		Config: config.Config{
 			Port: "8080",
 			Pubsub: config.Pubsub{
-				TopicId: "testtopic",
+				TopicId:   "testtopic",
 				ProjectId: "project",
 			},
 			Sample: config.Sample{
@@ -33,14 +36,15 @@ func init() {
 			},
 		},
 		Client: client,
-		Ctx: ctx,
+		Ctx:    ctx,
 	}
 }
 
 func TestFileUploadSuccess(t *testing.T) {
+	expectedReturn := "{\"id\":\"123\",\"totalSampleUnits\":5,\"expectedCollectionInstruments\":1}"
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusAccepted)
-		w.Write([]byte("{\"id\":\"123\"}"))
+		w.Write([]byte(expectedReturn))
 	}))
 	ts.Start()
 	defer ts.Close()
@@ -66,4 +70,8 @@ func TestFileUploadSuccess(t *testing.T) {
 	ProcessFile(res, req)
 
 	assert.Equal(t, 202, res.Code)
+
+	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	bodyString := string(bodyBytes)
+	assert.Equal(t, expectedReturn, bodyString)
 }

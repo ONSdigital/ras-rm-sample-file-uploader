@@ -9,8 +9,8 @@ on:
 env:
   IMAGE: sample-file-uploader
   REGISTRY_HOSTNAME: eu.gcr.io
-  HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
-  RELEASE_HOST: ${{ secrets.RELEASE_PROJECT_ID }}
+  HOST: ${{ secrets.GOOGLE_GOOGLE_CLOUD_PROJECT }}
+  RELEASE_HOST: ${{ secrets.RELEASE_GOOGLE_CLOUD_PROJECT }}
   CHART_DIRECTORY: _infra/helm/sample-file-uploader
   SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
   ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}

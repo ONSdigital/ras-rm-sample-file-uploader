@@ -8,7 +8,7 @@ env:
   IMAGE: sample-file-uploader
   SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
   ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
-  HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
+  HOST: ${{ secrets.GOOGLE_GOOGLE_CLOUD_PROJECT }}
 
 jobs:
   comment:

@@ -19,7 +19,7 @@ container:
 service:
   port: 8080
 
-pubsub:
+gcp:
   project: rm-ras-sandbox
   topic: topic
 

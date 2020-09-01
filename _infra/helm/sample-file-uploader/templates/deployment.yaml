@@ -37,10 +37,10 @@ spec:
           env:
           - name: PORT
             value: "{{ .Values.container.port }}"
-          - name: PROJECT_ID
-            value: {{ .Values.pubsub.project }}
-          - name: TOPIC_ID
-            value: {{ .Values.pubsub.topic }}
+          - name: GOOGLE_CLOUD_PROJECT
+            value: {{ .Values.gcp.project }}
+          - name: PUBSUB_TOPIC
+            value: {{ .Values.gcp.topic }}
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/credentials.json
           - name: VERBOSE

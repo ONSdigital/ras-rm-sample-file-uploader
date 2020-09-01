@@ -32,14 +32,14 @@ func ConfigSetup() config.Config {
 	viper.AutomaticEnv()
 	configureLogging()
 	viper.SetDefault("PORT", "8080")
-	viper.SetDefault("PROJECT_ID", "rm-ras-sandbox")
-	viper.SetDefault("TOPIC_ID", "topic")
+	viper.SetDefault("GOOGLE_CLOUD_PROJECT", "rm-ras-sandbox")
+	viper.SetDefault("PUBSUB_TOPIC", "topic")
 	viper.SetDefault("SAMPLE_SERVICE_BASE_URL", "http://localhost:8080")
 	config2 := config.Config{
 		Port: viper.GetString("PORT"),
 		Pubsub: config.Pubsub{
-			ProjectId: viper.GetString("PROJECT_ID"),
-			TopicId:   viper.GetString("TOPIC_ID"),
+			ProjectId: viper.GetString("GOOGLE_CLOUD_PROJECT"),
+			TopicId:   viper.GetString("PUBSUB_TOPIC"),
 		},
 		Sample: config.Sample{
 			BaseUrl: viper.GetString("SAMPLE_SERVICE_BASE_URL"),

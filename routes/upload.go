@@ -2,11 +2,18 @@ package routes
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"net/http"
 
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/inject"
 )
+
+var logger *zap.Logger
+
+func init() {
+	logger, _ = zap.NewProduction()
+	defer logger.Sync()
+}
 
 func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	// 10MB maximum file size
@@ -15,8 +22,7 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("file")
 	defer file.Close()
 	if err != nil {
-		log.WithError(err).
-			Error("Error retrieving the file")
+		logger.Error("Error retrieving the file", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -27,7 +33,7 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusAccepted)
 	js, err := json.Marshal(sampleSummary)
-	log.WithField("json", string(js)).Info("returning sample summary")
+	logger.Info("returning sample summary", zap.String("json", string(js)))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -8,6 +8,7 @@ import (
 )
 
 const FORMTYPE_CSV_POSITION = 25
+
 // readFileForCountTotals reads the file for counting
 // the total expected CIs and total sample count.
 // Will return a buffer thats written to by the tee reader

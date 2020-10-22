@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/blendle/zapdriver"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"mime/multipart"
@@ -32,7 +33,7 @@ type SampleSummary struct {
 var logger *zap.Logger
 
 func init() {
-	logger, _ = zap.NewProduction()
+	logger, _ = zapdriver.NewProduction()
 	defer logger.Sync()
 }
 

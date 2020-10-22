@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"github.com/blendle/zapdriver"
 	"go.uber.org/zap"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 var logger *zap.Logger
 
 func init() {
-	logger, _ = zap.NewProduction()
+	logger, _ = zapdriver.NewProduction()
 	defer logger.Sync()
 }
 

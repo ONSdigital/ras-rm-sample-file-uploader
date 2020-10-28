@@ -6,12 +6,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/blendle/zapdriver"
-	"go.uber.org/zap"
 	"io/ioutil"
+	logger "logging"
 	"mime/multipart"
 	"net/http"
 	"sync"
+
+	"go.uber.org/zap"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
@@ -28,13 +29,6 @@ type SampleSummary struct {
 	Id                            string `json:"id"`
 	TotalSampleUnits              int    `json:"totalSampleUnits"`
 	ExpectedCollectionInstruments int    `json:"expectedCollectionInstruments"`
-}
-
-var logger *zap.Logger
-
-func init() {
-	logger, _ = zapdriver.NewProduction()
-	defer logger.Sync()
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {

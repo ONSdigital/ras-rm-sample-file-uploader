@@ -2,19 +2,13 @@ package routes
 
 import (
 	"encoding/json"
-	"github.com/blendle/zapdriver"
-	"go.uber.org/zap"
+	logger "logging"
 	"net/http"
+
+	"go.uber.org/zap"
 
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/inject"
 )
-
-var logger *zap.Logger
-
-func init() {
-	logger, _ = zapdriver.NewProduction()
-	defer logger.Sync()
-}
 
 func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	// 10MB maximum file size

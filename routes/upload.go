@@ -2,12 +2,12 @@ package routes
 
 import (
 	"encoding/json"
-	logger "logging"
 	"net/http"
 
 	"go.uber.org/zap"
 
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/inject"
+	logger "github.com/ONSdigital/ras-rm-sample/file-uploader/logging"
 )
 
 func ProcessFile(w http.ResponseWriter, r *http.Request) {

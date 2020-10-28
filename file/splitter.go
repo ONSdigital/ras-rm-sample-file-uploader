@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	logger "logging"
 	"mime/multipart"
 	"net/http"
 	"sync"
@@ -16,6 +15,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
+	logger "github.com/ONSdigital/ras-rm-sample/file-uploader/logging"
 )
 
 type FileProcessor struct {

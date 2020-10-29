@@ -11,9 +11,11 @@ import (
 	"net/http"
 	"sync"
 
+	"go.uber.org/zap"
+
 	"cloud.google.com/go/pubsub"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
-	log "github.com/sirupsen/logrus"
+	logger "github.com/ONSdigital/ras-rm-sample/file-uploader/logging"
 )
 
 type FileProcessor struct {
@@ -35,10 +37,10 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 	if err != nil {
 		return nil, err
 	}
-	log.WithField("filename", handler.Filename).
-		WithField("filesize", handler.Size).
-		WithField("MIMEHeader", handler.Header).
-		Info("File uploaded")
+	logger.Info("File uploaded",
+		zap.String("filename", handler.Filename),
+		zap.Int64("filesize", handler.Size),
+		zap.Any("MIMEHeader", handler.Header))
 	errorCount := f.Publish(bufio.NewScanner(buf))
 	if errorCount > 0 {
 		return nil, errors.New("unable to process all of sample file")
@@ -47,17 +49,18 @@ func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHea
 }
 
 func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
-	log.WithField("topic", f.Config.Pubsub.TopicId).
-		WithField("project", f.Config.Pubsub.ProjectId).
-		Info("about to publish message")
+	logger.Info("about to publish message",
+		zap.String("topic", f.Config.Pubsub.TopicId),
+		zap.String("project", f.Config.Pubsub.ProjectId),
+	)
 	topic := f.Client.Topic(f.Config.Pubsub.TopicId)
 	var errorCount = 0
 	var wg sync.WaitGroup
 	var mux sync.Mutex
 	for scanner.Scan() {
 		line := scanner.Text()
-		log.WithField("line", line).
-			Debug("Publishing csv line")
+		logger.Debug("Publishing csv line",
+			zap.String("line", line))
 
 		wg.Add(1)
 		go func(line string, topic *pubsub.Topic, wg *sync.WaitGroup, mux *sync.Mutex, errorCount *int) {
@@ -70,28 +73,29 @@ func (f *FileProcessor) Publish(scanner *bufio.Scanner) int {
 				},
 			}).Get(f.Ctx)
 			if err != nil {
-				log.WithField("line", line).
-					WithError(err).
-					Error("Error publishing csv line")
+				logger.Error("Error publishing csv line",
+					zap.Error(err),
+					zap.String("line", line))
 				mux.Lock()
 				*errorCount++
 				mux.Unlock()
 			}
-			log.WithField("line", line).
-				WithField("messageId", id).
-				Debug("csv line delievered")
+			logger.Debug("csv line delivered",
+				zap.String("line", line),
+				zap.String("messageId", id))
 		}(line, topic, &wg, &mux, &errorCount)
 	}
 	wg.Wait()
 	if err := scanner.Err(); err != nil {
-		log.WithError(err).Error("Error scanning file")
+		logger.Error("Error scanning file",
+			zap.Error(err))
 	}
 	return errorCount
 }
 
 func (f *FileProcessor) getSampleSummary(ciCount int, totalUnits int) (*SampleSummary, error) {
 	baseUrl := f.Config.Sample.BaseUrl
-	log.WithField("url", baseUrl+"/samples/samplesummary").Info("about to create sample")
+	logger.Info("about to create sample", zap.String("url", baseUrl+"/samples/samplesummary"))
 	summaryRequest := &SampleSummary{
 		TotalSampleUnits:              totalUnits,
 		ExpectedCollectionInstruments: ciCount,
@@ -99,25 +103,31 @@ func (f *FileProcessor) getSampleSummary(ciCount int, totalUnits int) (*SampleSu
 
 	b, err := json.Marshal(summaryRequest)
 	if err != nil {
-		log.WithField("summaryRequest", summaryRequest).WithError(err).Error("Error marshalling Sample Summary Request")
+		logger.Error("Error marshalling Sample Summary Request",
+			zap.Any("summaryRequest", summaryRequest),
+			zap.Error(err))
 		return nil, err
 	}
 
 	resp, err := http.Post(baseUrl+"/samples/samplesummary", "application/json", bytes.NewReader(b))
 	if err != nil {
-		log.WithError(err).Error("unable to create a sample summary")
+		logger.Error("unable to create a sample summary",
+			zap.Error(err))
 		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	log.WithField("body", string(body)).Info("returned sample summary data")
+	logger.Info("returned sample summary data",
+		zap.String("body", string(body)))
 	sampleSummary := &SampleSummary{}
 	err = json.Unmarshal(body, sampleSummary)
 	if err != nil {
-		log.WithError(err).Error("error marshalling response data")
+		logger.Error("error marshalling response data",
+			zap.Error(err))
 		return nil, err
 	}
-	log.WithField("samplesummary", sampleSummary).Info("created sample summary")
+	logger.Info("created sample summary",
+		zap.Any("samplesummary", sampleSummary))
 	f.SampleSummary = sampleSummary
 	return sampleSummary, nil
 }

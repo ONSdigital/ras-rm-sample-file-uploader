@@ -2,10 +2,12 @@ package routes
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 
+	"go.uber.org/zap"
+
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/inject"
+	logger "github.com/ONSdigital/ras-rm-sample/file-uploader/logging"
 )
 
 func ProcessFile(w http.ResponseWriter, r *http.Request) {
@@ -15,8 +17,7 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("file")
 	defer file.Close()
 	if err != nil {
-		log.WithError(err).
-			Error("Error retrieving the file")
+		logger.Error("Error retrieving the file", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -27,7 +28,7 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusAccepted)
 	js, err := json.Marshal(sampleSummary)
-	log.WithField("json", string(js)).Info("returning sample summary")
+	logger.Info("returning sample summary", zap.String("json", string(js)))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -6,9 +6,9 @@ import (
 	"context"
 
 	"cloud.google.com/go/pubsub"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/config"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/file"
 	logger "github.com/ONSdigital/ras-rm-sample-file-uploader/logging"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/file"
 	"github.com/google/wire"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"

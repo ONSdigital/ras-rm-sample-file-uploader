@@ -6,8 +6,8 @@ import (
 
 	"go.uber.org/zap"
 
+	logger "github.com/ONSdigital/ras-rm-sample-file-uploader/logging"
 	"github.com/ONSdigital/ras-rm-sample/file-uploader/inject"
-	logger "github.com/ONSdigital/ras-rm-sample/file-uploader/logging"
 )
 
 func ProcessFile(w http.ResponseWriter, r *http.Request) {

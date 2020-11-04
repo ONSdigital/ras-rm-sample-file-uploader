@@ -9,8 +9,8 @@ import (
 
 	"testing"
 
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/stub"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/config"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/stub"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/routes"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/routes"
 
 	"github.com/gorilla/mux"
 )

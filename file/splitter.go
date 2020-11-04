@@ -14,8 +14,8 @@ import (
 	"go.uber.org/zap"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
-	logger "github.com/ONSdigital/ras-rm-sample/file-uploader/logging"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/config"
+	logger "github.com/ONSdigital/ras-rm-sample-file-uploader/logging"
 )
 
 type FileProcessor struct {

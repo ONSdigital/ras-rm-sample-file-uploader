@@ -1,4 +1,4 @@
-module github.com/ONSdigital/ras-rm-sample/file-uploader
+module github.com/ONSdigital/ras-rm-sample-file-uploader
 
 go 1.14
 

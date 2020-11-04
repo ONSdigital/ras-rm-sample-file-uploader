@@ -6,10 +6,11 @@
 package inject
 
 import (
-	"cloud.google.com/go/pubsub"
 	"context"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/config"
-	"github.com/ONSdigital/ras-rm-sample/file-uploader/file"
+
+	"cloud.google.com/go/pubsub"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/config"
+	"github.com/ONSdigital/ras-rm-sample-file-uploader/file"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )

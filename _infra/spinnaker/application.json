@@ -1,6 +1,0 @@
-{
-  "cloudProviders": "kubernetes",
-  "email": "john.terry@ons.gov.uk",
-  "instancePort": 80,
-  "name": "sample-file-uploader"
-}

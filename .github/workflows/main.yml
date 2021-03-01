@@ -5,9 +5,10 @@ on:
     branches: [ main ]
     paths-ignore: 
       - _infra/spinnaker/**
+      - _infra/helm/sample-file-uploader/Chart.yaml
   pull_request:
     branches: [ main ]
-    paths-ignore: 
+    paths-ignore:
       - _infra/spinnaker/**
       - _infra/helm/sample-file-uploader/Chart.yaml
 env:

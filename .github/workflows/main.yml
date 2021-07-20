@@ -56,6 +56,7 @@ jobs:
       - name: Build Docker Image
         if: github.ref != 'refs/heads/main'
         run: |
+          make
           docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} .
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go

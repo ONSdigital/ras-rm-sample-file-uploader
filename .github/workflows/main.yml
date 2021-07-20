@@ -57,6 +57,11 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: |
           docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} .
+        env:
+          GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: 0
       - name: Push dev image
         if: github.ref != 'refs/heads/main'
         run: |

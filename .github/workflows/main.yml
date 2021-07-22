@@ -153,6 +153,11 @@ jobs:
         run: |
           make
           docker build -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":latest -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }} .
+        env:
+          GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: 0
       - name: Push Release image
         if: github.ref == 'refs/heads/main'
         run: |

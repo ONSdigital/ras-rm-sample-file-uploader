@@ -13,10 +13,10 @@ service:
 
 resources:
   requests:
-    memory: "50Mi"
     cpu: "10m"
+    memory: "50Mi"
   limits:
-    cpu: "80m"
+    cpu: "25m"
     memory: "150Mi"
 
 autoscaling: false

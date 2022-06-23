@@ -32,7 +32,10 @@ type SampleSummary struct {
 }
 
 func (f *FileProcessor) ChunkCsv(file multipart.File, handler *multipart.FileHeader) (*SampleSummary, error) {
-	ciCount, totalUnits, buf := readFileForCountTotals(file)
+	ciCount, totalUnits, buf, err := readFileForCountTotals(file)
+	if err != nil {
+		return nil, err
+	}
 	sampleSummary, err := f.getSampleSummary(ciCount, totalUnits)
 	if err != nil {
 		return nil, err

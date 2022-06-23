@@ -23,7 +23,7 @@ func ProcessFile(w http.ResponseWriter, r *http.Request) {
 	}
 	sampleSummary, err := inject.FileProcessor.ChunkCsv(file, handler)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusAccepted)

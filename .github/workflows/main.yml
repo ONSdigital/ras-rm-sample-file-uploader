@@ -38,7 +38,7 @@ jobs:
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
 
-      - uses: google-github-actions/setup-gcloud@master
+      - uses: google-github-actions/setup-gcloud@main
         with:
           version: '270.0.0'
           service_account_key: ${{ secrets.GCR_KEY }}

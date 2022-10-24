@@ -42,3 +42,12 @@ func TestHandlesInvalidNumberOfSampleFileColumns(t *testing.T) {
 	_, _, _, err = readFileForCountTotals(file)
 	assert.Equal(t, err.Error(), "Too few columns in CSV file")
 }
+
+func TestDuplicateSampleIdCausesError(t *testing.T) {
+    file, err := os.Open("duplicate_sample_test_file.csv")
+    assert.Nil(t, err)
+    defer file.Close()
+
+    _, _, _, err = readFileForCountTotals(file)
+    assert.Equal(t, err.Error(), "Duplicate sample unit in file")
+}

@@ -25,7 +25,7 @@ func readFileForCountTotals(r io.Reader) (int, int, *bytes.Buffer, error) {
 	scanner := bufio.NewScanner(tee)
 	sampleCount := 0
 	formTypes := make(map[string]string)
-	sampleIds := []int{}
+	sampleIds := []string{}
 	for scanner.Scan() {
 		sampleCount++
 		line := scanner.Text()

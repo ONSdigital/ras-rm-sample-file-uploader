@@ -8,9 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"go.uber.org/zap" //get rid of this later
-
-	logger "github.com/ONSdigital/ras-rm-sample-file-uploader/logging" //get rid of this later
+	"fmt" //get rid of this later
 )
 
 const FORMTYPE_CSV_POSITION = 25
@@ -39,13 +37,15 @@ func readFileForCountTotals(r io.Reader) (int, int, *bytes.Buffer, error) {
 	}
 
 	//get rid of this later
-    logger.Info("BEFORE SORT", zap.String("sampleIds", sampleIds))
+    fmt.Println("BEFORE SORT")
+    fmt.Println(sampleIds)
 
     //checking for duplicate sampleIds
-    sort.Stable(sampleIds)
+    sort.Sort(sort.StringSlice(sampleIds))
 
     //get rid of this later
-    logger.Info("AFTER SORT", zap.String("sampleIds", sampleIds))
+    fmt.Println("AFTER SORT")
+    fmt.Println(sampleIds)
 
     pointer := 0
     for i := 1; i < len(sampleIds); i++ {

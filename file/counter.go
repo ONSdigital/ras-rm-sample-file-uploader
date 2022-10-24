@@ -49,7 +49,7 @@ func readFileForCountTotals(r io.Reader) (int, int, *bytes.Buffer, error) {
 
     pointer := 0
     for i := 1; i < len(sampleIds); i++ {
-        if sampleIds[pointer] = sampleIds[i] {
+        if sampleIds[pointer] == sampleIds[i] {
             return 0, 0, nil, errors.New("Duplicate sample unit in file")
         }
         pointer++

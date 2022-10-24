@@ -7,8 +7,6 @@ import (
 	"io"
 	"sort"
 	"strings"
-
-	"fmt" //get rid of this later
 )
 
 const FORMTYPE_CSV_POSITION = 25
@@ -32,21 +30,10 @@ func readFileForCountTotals(r io.Reader) (int, int, *bytes.Buffer, error) {
 			return 0, 0, nil, errors.New("Too few columns in CSV file")
 		}
 		formTypes[s[FORMTYPE_CSV_POSITION]] = s[FORMTYPE_CSV_POSITION]
-
 		sampleIds = append(sampleIds, s[0])
 	}
 
-	//get rid of this later
-    fmt.Println("BEFORE SORT")
-    fmt.Println(sampleIds)
-
-    //checking for duplicate sampleIds
     sort.Sort(sort.StringSlice(sampleIds))
-
-    //get rid of this later
-    fmt.Println("AFTER SORT")
-    fmt.Println(sampleIds)
-
     pointer := 0
     for i := 1; i < len(sampleIds); i++ {
         if sampleIds[pointer] == sampleIds[i] {

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"sort"
 	"strings"
 )
 
@@ -20,6 +21,7 @@ func readFileForCountTotals(r io.Reader) (int, int, *bytes.Buffer, error) {
 	scanner := bufio.NewScanner(tee)
 	sampleCount := 0
 	formTypes := make(map[string]string)
+	sampleIds := []string{}
 	for scanner.Scan() {
 		sampleCount++
 		line := scanner.Text()
@@ -28,6 +30,17 @@ func readFileForCountTotals(r io.Reader) (int, int, *bytes.Buffer, error) {
 			return 0, 0, nil, errors.New("Too few columns in CSV file")
 		}
 		formTypes[s[FORMTYPE_CSV_POSITION]] = s[FORMTYPE_CSV_POSITION]
+		sampleIds = append(sampleIds, s[0])
 	}
+
+    sort.Sort(sort.StringSlice(sampleIds))
+    pointer := 0
+    for i := 1; i < len(sampleIds); i++ {
+        if sampleIds[pointer] == sampleIds[i] {
+            return 0, 0, nil, errors.New("Duplicate sample unit in file")
+        }
+        pointer++
+    }
+
 	return len(formTypes), sampleCount, &buf, nil
 }

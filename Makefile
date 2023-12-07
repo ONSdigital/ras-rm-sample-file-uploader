@@ -2,7 +2,7 @@ projectName := file-uploader
 
 .PHONY: install
 install: checkgo clean mod
-	go build -i -v -o main
+	go clean -i && go build -v -o main
 	chmod 755 main
 
 .PHONY: checkgo

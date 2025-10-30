@@ -1,4 +1,4 @@
-FROM golang:1.19.3-alpine3.16
+FROM golang:1.25-alpine
 
 RUN addgroup -S sample-group && adduser -S sample-user -G sample-group
 

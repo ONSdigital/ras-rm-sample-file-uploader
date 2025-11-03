@@ -2,7 +2,7 @@ projectName := file-uploader
 
 .PHONY: install
 install: checkgo clean mod
-	go clean -i && GOARCH=arm64 GOOS=darwin go build -v -o main
+	go clean -i && go build -v -o main
 	chmod 755 main
 
 .PHONY: checkgo

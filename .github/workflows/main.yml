@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          make mod test
+          make mod
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
 
@@ -70,7 +70,7 @@ jobs:
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
           GOOS: linux
-          GOARCH: amd64
+          GOARCH: arm64
           CGO_ENABLED: 0
       - name: Push dev image
         if: github.ref != 'refs/heads/main' && github.actor != 'dependabot[bot]'

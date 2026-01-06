@@ -34,15 +34,6 @@ export ORIGIN?=$(shell git config --get remote.origin.url)
 
 # Cross-compile the binary for Linux and macOS, setting linker flags for information returned by the GET /info endpoint.
 build: clean
-	echo PACKAGE_PATH: $(PACKAGE_PATH)
-	echo LINUX_BUILD_ARCH: $(LINUX_BUILD_ARCH)
-	echo MAC_BUILD_ARCH: $(MAC_BUILD_ARCH)
-	echo BRANCH_FLAG: $(BRANCH_FLAG)
-	echo BUILT_FLAG: $(BUILT_FLAG)
-	echo COMMIT_FLAG: $(COMMIT_FLAG)
-	echo ORIGIN_FLAG: $(ORIGIN_FLAG)
-	echo VERSION_FLAG: $(VERSION_FLAG)
-
 	GOOS=$(OS_LINUX) GOARCH=$(LINUX_ARCH) CGO_ENABLED=0 go build -o $(LINUX_BUILD_ARCH)/bin/main -ldflags="-X $(BRANCH_FLAG) -X $(BUILT_FLAG) -X $(COMMIT_FLAG) -X $(ORIGIN_FLAG) -X $(VERSION_FLAG)" main.go
 	GOOS=$(OS_MAC) GOARCH=$(MAC_ARCH) CGO_ENABLED=0 go build -o $(MAC_BUILD_ARCH)/bin/main -ldflags="-X $(BRANCH_FLAG) -X $(BUILT_FLAG) -X $(COMMIT_FLAG) -X $(ORIGIN_FLAG) -X $(VERSION_FLAG)" main.go
 

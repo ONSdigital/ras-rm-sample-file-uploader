@@ -69,6 +69,10 @@ jobs:
         run: |
           make
           ls -ltra build
+          ls -ltra build/linux-amd64
+          ls -ltra build/linux-arm64
+          ls -ltra build/linux-amd64/bin
+          ls -ltra build/linux-arm64/bin
           docker buildx build --platform linux/amd64,linux/arm64 \
           -t "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }} \
           --push .

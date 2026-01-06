@@ -14,10 +14,11 @@ RUN addgroup -S sample-group && adduser -S sample-user -G sample-group
 RUN mkdir -p "/opt/sample"
 RUN chown sample-user:sample-group /opt/sample
 
-COPY --from=build-stage /src/main /opt/sample/
-
+WORKDIR "/opt/sample"
+COPY --from=build-stage /src/main .
 RUN chmod 550 /opt/sample/main
 RUN chown sample-user:sample-group /opt/sample/main
+RUN ls -ltra /opt/sample
 
 USER sample-user
 

@@ -9,8 +9,8 @@ OS_MAC=linux
 
 # Output directory structures.
 BUILD=build
-LINUX_BUILD_ARCH=$(BUILD)/$(OS_LINUX)-$(LINUX_ARCH)
-MAC_BUILD_ARCH=$(BUILD)/$(OS_MAC)-$(MAC_ARCH)
+LINUX_BUILD_ARCH=./$(OS_LINUX)-$(LINUX_ARCH)
+MAC_BUILD_ARCH=./$(OS_MAC)-$(MAC_ARCH)
 
 # Flags to pass to the Go linker using the -ldflags="-X ..." option.
 PACKAGE_PATH=github.com/ONSdigital/ras-rm-sample-file-uploader
@@ -34,12 +34,12 @@ export ORIGIN?=$(shell git config --get remote.origin.url)
 
 # Cross-compile the binary for Linux and macOS, setting linker flags for information returned by the GET /info endpoint.
 build: clean
-	GOOS=$(OS_LINUX) GOARCH=$(LINUX_ARCH) CGO_ENABLED=0 go build -o $(LINUX_BUILD_ARCH)/bin/main -ldflags="-X $(BRANCH_FLAG) -X $(BUILT_FLAG) -X $(COMMIT_FLAG) -X $(ORIGIN_FLAG) -X $(VERSION_FLAG)" main.go
-	GOOS=$(OS_MAC) GOARCH=$(MAC_ARCH) CGO_ENABLED=0 go build -o $(MAC_BUILD_ARCH)/bin/main -ldflags="-X $(BRANCH_FLAG) -X $(BUILT_FLAG) -X $(COMMIT_FLAG) -X $(ORIGIN_FLAG) -X $(VERSION_FLAG)" main.go
+	GOOS=$(OS_LINUX) GOARCH=$(LINUX_ARCH) CGO_ENABLED=0 go build -o $(LINUX_BUILD_ARCH)-main -ldflags="-X $(BRANCH_FLAG) -X $(BUILT_FLAG) -X $(COMMIT_FLAG) -X $(ORIGIN_FLAG) -X $(VERSION_FLAG)" main.go
+	GOOS=$(OS_MAC) GOARCH=$(MAC_ARCH) CGO_ENABLED=0 go build -o $(MAC_BUILD_ARCH)-main -ldflags="-X $(BRANCH_FLAG) -X $(BUILT_FLAG) -X $(COMMIT_FLAG) -X $(ORIGIN_FLAG) -X $(VERSION_FLAG)" main.go
 
 # Remove the build directory tree.
 clean:
-	if [ -d $(BUILD) ]; then rm -r $(BUILD); fi;
+	if [ -d $(BUILD) ]; then rm -r linux-*-main; fi;
 
 .PHONY: install
 install: checkgo clean mod

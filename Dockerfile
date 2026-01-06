@@ -1,15 +1,20 @@
-FROM --platform=$BUILDPLATFORM golang:1.25-alpine
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS build-stage
+
+RUN mkdir "/src"
+WORKDIR "/src"
+
+COPY . .
+
+RUN go build -v -o main
+RUN chmod 755 main
+
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS final-stage
 
 RUN addgroup -S sample-group && adduser -S sample-user -G sample-group
-
 RUN mkdir -p "/opt/sample"
 RUN chown sample-user:sample-group /opt/sample
 
-RUN if [ "$BUILDPLATFORM" = "linux/amd64" ]; then \
-      cp build/linux-amd64/bin/main /opt/sample; \
-    elif [ "$BUILDPLATFORM" = "linux/arm64" ]; then \
-      cp build/linux-arm64/bin/main /opt/sample; \
-    fi
+COPY --from=build-stage /src/main /opt/sample/
 
 RUN chmod 550 /opt/sample/main
 RUN chown sample-user:sample-group /opt/sample/main

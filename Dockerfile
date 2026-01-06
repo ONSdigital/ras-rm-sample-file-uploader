@@ -8,9 +8,10 @@ RUN chown sample-user:sample-group /opt/sample
 WORKDIR "/opt/sample"
 
 RUN if [ "$BUILDPLATFORM" = "linux/amd64" ]; then \
-      cp build/linux-amd64/bin/main /opt/sample/main; \
+      cp build/linux-amd64/bin/main \
+         build/linux-arm64/bin/main .; \
     elif [ "$BUILDPLATFORM" = "linux/arm64" ]; then \
-      cp build/linux-arm64/bin/main /opt/sample/main; \
+      cp build/linux-arm64/bin/main .; \
     fi
 
 RUN chmod 550 /opt/sample/main

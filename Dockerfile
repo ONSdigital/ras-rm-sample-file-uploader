@@ -18,7 +18,6 @@ WORKDIR "/opt/sample"
 COPY --from=build-stage /src/main .
 RUN chmod 550 /opt/sample/main
 RUN chown sample-user:sample-group /opt/sample/main
-RUN ls -ltra /opt/sample
 
 USER sample-user
 

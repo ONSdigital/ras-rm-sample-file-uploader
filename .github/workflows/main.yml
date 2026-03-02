@@ -15,6 +15,7 @@ env:
   CHART_DIRECTORY: _infra/helm/sample-file-uploader
   SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
   ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
+#  GOTOOLCHAIN: local
 
 jobs:
   build:
@@ -35,16 +36,7 @@ jobs:
 
       - name: Run Tests
         run: |
-           make mod
-           go version
-           go env GOTOOLCHAIN
-          
-           which go
-           go env GOROOT GOTOOLDIR GOPATH GOOS GOARCH
-           ls -la "$(go env GOTOOLDIR)" | grep covdata || true
-           
            make test
-#          make mod
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
 

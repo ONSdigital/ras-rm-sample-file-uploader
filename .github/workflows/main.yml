@@ -15,6 +15,7 @@ env:
   CHART_DIRECTORY: _infra/helm/sample-file-uploader
   SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
   ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
+  GOTOOLCHAIN: local
 
 jobs:
   build:
@@ -35,7 +36,18 @@ jobs:
 
       - name: Run Tests
         run: |
-           make mod test
+          
+           go env GOTOOLCHAIN
+           go env GOTOOLDIR
+           ls "$(go env GOTOOLDIR)" | grep covdata
+          
+           make mod
+    
+           go env GOTOOLCHAIN
+           go env GOTOOLDIR
+           ls "$(go env GOTOOLDIR)" | grep covdata
+           
+           make test
 
       - name: Authenticate with Google Cloud
         if: github.actor != 'dependabot[bot]'

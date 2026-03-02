@@ -35,7 +35,10 @@ jobs:
 
       - name: Run Tests
         run: |
-           make mod test
+           make mod
+           go version
+           go env GOTOOLCHAIN
+           make test
 #          make mod
         env:
           GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go

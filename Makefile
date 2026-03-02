@@ -25,6 +25,4 @@ mod:
 # `covdata` package caused by the above issue with the `GOTOOLCHAIN` version
 .PHONY: test
 test:
-	GOVERSION := $(shell go env GOVERSION)
-	export GOTOOLCHAIN := $(GOVERSION)+auto
-	go test -v -parallel=1 -race -coverprofile=coverage.txt ./...
+	GOTOOLCHAIN=go1.25.1+auto go test -v -parallel=1 -race -coverprofile=coverage.txt ./...

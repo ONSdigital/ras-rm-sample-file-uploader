@@ -36,8 +36,6 @@ jobs:
       - name: Run Tests
         run: |
            make mod test
-        env:
-          GOPATH: /home/runner/work/ras-rm-sample-file-uploader/go
 
       - name: Authenticate with Google Cloud
         if: github.actor != 'dependabot[bot]'

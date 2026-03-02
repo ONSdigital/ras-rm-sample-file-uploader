@@ -38,6 +38,11 @@ jobs:
            make mod
            go version
            go env GOTOOLCHAIN
+          
+           which go
+           go env GOROOT GOTOOLDIR GOPATH GOOS GOARCH
+           ls -la "$(go env GOTOOLDIR)" | grep covdata || true
+           
            make test
 #          make mod
         env:

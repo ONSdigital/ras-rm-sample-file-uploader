@@ -5,15 +5,15 @@ go 1.25
 require (
 	cloud.google.com/go/pubsub v1.50.1
 	github.com/blendle/zapdriver v1.3.1
-	github.com/google/wire v0.7.0
-	github.com/gorilla/mux v1.8.1
-	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/viper v1.21.0
-	github.com/stretchr/testify v1.11.1
-	go.uber.org/zap v1.27.0
-	google.golang.org/api v0.254.0
-	google.golang.org/grpc v1.76.0
-	gorm.io/gorm v1.31.0
+	github.com/google/wire v0.4.0
+	github.com/gorilla/mux v1.7.4
+	github.com/sirupsen/logrus v1.8.3
+	github.com/spf13/viper v1.7.0
+	github.com/stretchr/testify v1.8.1
+	go.uber.org/zap v1.16.0
+	google.golang.org/api v0.114.0
+	google.golang.org/grpc v1.56.3
+	gorm.io/gorm v1.24.2
 )
 
 require (
@@ -24,18 +24,16 @@ require (
 	cloud.google.com/go/iam v1.5.3 // indirect
 	cloud.google.com/go/pubsub/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
-	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
-	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/google/uuid v1.6.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
-	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
+	github.com/fsnotify/fsnotify v1.4.7 // indirect
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
+	github.com/googleapis/gax-go/v2 v2.7.1 // indirect
+	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/magiconair/properties v1.8.1 // indirect
+	github.com/mitchellh/mapstructure v1.1.2 // indirect
+	github.com/pelletier/go-toml v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
